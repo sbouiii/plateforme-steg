@@ -1,10 +1,11 @@
 services:
   - type: web
-    name: steg-platform
+    name: plateforme-steg
     runtime: docker
-    buildCommand: |
-      apt-get update && apt-get install -y libpq-dev
-      docker-php-ext-install pdo pdo_pgsql
-      composer install --no-dev
-      php artisan key:generate
-      php artisan migrate --force
+    plan: free
+    region: ohio
+    buildCommand: composer install --optimize-autoloader --no-dev
+    startCommand: heroku-php-apache2 public/
+    envVars:
+      - key: PHP_VERSION
+        value: 8.2
