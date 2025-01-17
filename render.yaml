@@ -1,26 +1,26 @@
 services:
   - type: web
     name: laravel-app
-    env: docker
-    plan: free
+    runtime: docker
     dockerfilePath: ./Dockerfile
-    buildCommand: ""
-    startCommand: php artisan serve --host=0.0.0.0 --port=8000
-    autoDeploy: true
+    plan: starter
+    healthCheckPath: /
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_KEY
-        value: base64:your-app-key
+        value: base64:GENERATE_YOUR_APP_KEY_HERE
+      - key: APP_DEBUG
+        value: "false"
       - key: DB_CONNECTION
-        value: mysql
+        value: pgsql
       - key: DB_HOST
-        value: your-database-host
+        value: dpg-cu55e1bv2p9s73a0ah80-a.oregon-postgres.render.com
       - key: DB_PORT
-        value: 3306
+        value: 5432
       - key: DB_DATABASE
-        value: laravel
+        value: stegdb
       - key: DB_USERNAME
-        value: root
+        value: stegdb_user
       - key: DB_PASSWORD
-        value: root
+        value: Q4WE0BImAiFDo5ijMhZIdwRsfjIRSBcP

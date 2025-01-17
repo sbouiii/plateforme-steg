@@ -1,32 +1,30 @@
-# Base image
+# Utiliser une image PHP officielle avec Composer et extensions
 FROM php:8.2-fpm
 
-# Install system dependencies
+# Installer les dépendances nécessaires
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    zip \
-    unzip \
     libpq-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
+    git \
+    unzip \
+    && docker-php-ext-install pdo pdo_pgsql
 
-# Install Composer
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+# Installer Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set the working directory
+# Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Copy project files
+# Copier les fichiers
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --optimize-autoloader --no-dev
+# Installer les dépendances PHP
+RUN composer install --no-dev --optimize-autoloader
 
-# Expose port 9000 for PHP-FPM
+# Donner les permissions nécessaires
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Exposer le port pour PHP-FPM
 EXPOSE 9000
 
-# Run PHP-FPM
+# Commande par défaut
 CMD ["php-fpm"]
