@@ -1,20 +1,24 @@
 FROM richarvey/nginx-php-fpm:1.7.2
 
-COPY . .
+# Copier les fichiers sources
+COPY . /var/www/html
 
-# Image config
-ENV SKIP_COMPOSER 1
+# Définir le webroot pour Laravel
 ENV WEBROOT /var/www/html/public
-ENV PHP_ERRORS_STDERR 1
-ENV RUN_SCRIPTS 1
-ENV REAL_IP_HEADER 1
 
-# Laravel config
+# Installer les dépendances Laravel avec Composer
+RUN apk add --no-cache git unzip \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer install --no-dev --optimize-autoloader --working-dir=/var/www/html
+
+# Configurer les permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Configurer les variables d'environnement
 ENV APP_ENV production
 ENV APP_DEBUG false
 ENV LOG_CHANNEL stderr
 
-# Allow composer to run as root
-ENV COMPOSER_ALLOW_SUPERUSER 1
-
+# Commande de démarrage
 CMD ["/start.sh"]
