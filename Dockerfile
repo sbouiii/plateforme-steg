@@ -1,31 +1,20 @@
-# Utiliser une image PHP officielle avec Composer et extensions
-FROM php:8.2-fpm
+FROM richarvey/nginx-php-fpm:1.7.2
 
-# Installer les dépendances nécessaires
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    libzip-dev \
-    unzip \
-    git \
-    && docker-php-ext-install pdo pdo_pgsql zip
-
-# Installer Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# Définir le répertoire de travail
-WORKDIR /var/www/html
-
-# Copier les fichiers
 COPY . .
 
-# Installer les dépendances PHP
-RUN composer install --no-dev --optimize-autoloader
+# Image config
+ENV SKIP_COMPOSER 1
+ENV WEBROOT /var/www/html/public
+ENV PHP_ERRORS_STDERR 1
+ENV RUN_SCRIPTS 1
+ENV REAL_IP_HEADER 1
 
-# Donner les permissions nécessaires
-RUN chown -R www-data:www-data storage bootstrap/cache
+# Laravel config
+ENV APP_ENV production
+ENV APP_DEBUG false
+ENV LOG_CHANNEL stderr
 
-# Exposer le port pour PHP-FPM
-EXPOSE 9000
+# Allow composer to run as root
+ENV COMPOSER_ALLOW_SUPERUSER 1
 
-# Commande par défaut
-CMD ["php-fpm"]
+CMD ["/start.sh"]
